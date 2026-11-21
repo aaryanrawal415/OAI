@@ -1,0 +1,13 @@
+# Routing server for the demo corridors.
+# Status: written, NOT yet run. Needs routing/data/corridors.osrm* built first (see README.md).
+# Run from the project root:  docker compose -f routing/docker-compose.osrm.yml up
+# After the first successful run, replace "latest" with a fixed version tag so builds repeat.
+services:
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    command: osrm-routed --algorithm mld /data/corridors.osrm
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

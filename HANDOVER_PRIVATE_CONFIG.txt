@@ -1,0 +1,106 @@
+OPTIFREIGHT AI — PRIVATE CONFIGURATION & INTEGRATION INVENTORY
+================================================================
+Generated: 2026-11-20
+Location: C:\Users\Aaryan Rawal\.gemini\antigravity\scratch\OptiFreight_AI\OptiFreight AI\HANDOVER_PRIVATE_CONFIG.txt
+Security Note: This document does NOT contain raw secret values. It documents variable names, storage locations, provenance, and verification states.
+
+--------------------------------------------------------------------------------
+1. PostgreSQL Database & PostGIS
+--------------------------------------------------------------------------------
+• Service Name: PostgreSQL Relational Database (with PostGIS spatial extension)
+• Purpose: Persistent storage for User accounts, Truck profiles, Cargo listings, Routes, Jobs, Trip Plans, Match Runs, Decision Records, and Shipments.
+• Expected Environment Variables:
+  - DATABASE_URL (Format: postgresql+asyncpg://<username>:<password>@<host>:<port>/<dbname>)
+  - POSTGRES_USER
+  - POSTGRES_PASSWORD
+  - POSTGRES_DB
+• Configuration Storage Locations:
+  - backend\.env (Line 4: DATABASE_URL)
+  - config\default.yaml (database block: user, password, host: localhost, port: 5432, dbname: optifreight)
+  - .env (Root template)
+• Credential Status: Configured and recovered from user input.
+  - Username: optifreight
+  - Password: Confirmed by user (stored in backend\.env and config\default.yaml; never committed to git)
+  - Database Name: optifreight
+  - Host/Port: localhost:5432
+• Local Service Status: PostgreSQL 18 binary directory located at "C:\Program Files\PostgreSQL\18". Service is currently stopped / port 5432 not responding.
+• Verification Status: Driver mismatch in backend/app/db.py (configured with sync psycopg2 instead of asyncpg for create_async_engine). Requires service startup and driver alignment.
+
+--------------------------------------------------------------------------------
+2. UNCTADstat OData Freight Cost Integration
+--------------------------------------------------------------------------------
+• Service Name: UNCTADstat Data Centre — Transport Costs API
+• Purpose: Ingestion of international freight cost benchmarks (Trade and transport: By destination, mode, and product group — annual analytical report).
+• Endpoint & Protocol:
+  - Method: HTTP POST/GET (OData Facts endpoint)
+  - Base URL: https://unctadstat-user-api.unctad.org/US.TransportCosts/cur/Facts?culture=en
+  - Format: CSV compressed via gzip ($format=csv, compress=gz)
+  - OData Filters: TransportMode/Code eq '00', Origin/Code eq '0000', Product/Code eq 'TOTAL', specific destination country codes, Years (2016-2021).
+• Required Request Headers:
+  - "ClientId": <UNCTAD_CLIENT_ID>
+  - "ClientSecret": <UNCTAD_CLIENT_SECRET>
+• Environment Variables:
+  - UNCTAD_CLIENT_ID (or ClientId)
+  - UNCTAD_CLIENT_SECRET (or ClientSecret)
+• Configuration Storage Locations:
+  - backend\.env (Lines 1-2)
+  - config\default.yaml (uncdt_api block)
+• Credential Status: Configured and valid (recovered directly from user's provided API key screenshot/script). Stored in backend\.env.
+• Current Implementation State:
+  - Existing files (backend/app/services/unctad.py and backend/app/source_adapters/public_api.py) contain stub URLs ("https://unctad.org/api/v1/trade") which are hallucinated.
+  - Needs replacement with the authentic Python requests + gzip translation of the user's R script.
+
+--------------------------------------------------------------------------------
+3. Open Source Routing Machine (OSRM)
+--------------------------------------------------------------------------------
+• Service Name: Project OSRM Routing Engine
+• Purpose: Road-network routing, exact distance matrix calculations, driving duration, polyline geometries, and 40 km excursion checks.
+• Endpoint:
+  - Configurable via OSRM_URL
+  - Local Dev / Docker target: http://localhost:5000 (defined in routing/docker-compose.osrm.yml)
+  - Public Demo Fallback: https://router.project-osrm.org
+• Authentication: None required.
+• Configuration Storage Locations:
+  - .env (Root template: OSRM_URL=)
+  - backend/app/config.py (needs OSRM_URL field added)
+• Current Implementation State:
+  - backend/app/routing_adapters/client.py currently points to dummy "https://routing.example.com" with an invalid token header.
+  - Needs autonomous configuration to try local OSRM (http://localhost:5000), fallback to public demonstration endpoint, or fall back to pre-calculated corridor GeoJSON (routing/corridors.geojson) with fail-closed Verdict.unknown if offline.
+
+--------------------------------------------------------------------------------
+4. JWT Authentication & Password Security
+--------------------------------------------------------------------------------
+• Service Name: JSON Web Token (JWT) & Argon2 Password Hashing
+• Purpose: Secure user registration, login, role authorization, and session tokens.
+• Expected Environment Variables:
+  - JWT_SECRET_KEY (or JWT_SECRET)
+  - ACCESS_TOKEN_EXPIRE_MINUTES (Default: 60)
+  - ALGORITHM (HS256)
+• Configuration Storage Locations:
+  - backend\.env (Line 3: JWT_SECRET_KEY)
+  - config\default.yaml (jwt block)
+• Credential Status: Configured in backend\.env.
+• Current Implementation State:
+  - JWT creation and verification implemented in backend/app/authentication/security.py.
+  - Password hashing is currently a stub (secrets.token_hex and verify_password returns True). Must be replaced with argon2-cffi.
+
+--------------------------------------------------------------------------------
+5. Google Maps Embed API (Optional Minimap)
+--------------------------------------------------------------------------------
+• Service Name: Google Maps Embed API
+• Purpose: Optional mini-map display on shipment/route review page. Decision D-030 establishes Leaflet as primary; Google Maps is optional and added last.
+• Environment Variable:
+  - GOOGLE_MAPS_EMBED_KEY
+• Configuration Storage Locations:
+  - .env (Root template)
+• Credential Status: None supplied (optional; application operates fully with Leaflet/OpenStreetMap).
+
+--------------------------------------------------------------------------------
+6. Machine Learning Model Artifacts
+--------------------------------------------------------------------------------
+• Components: Model A (LambdaRank cargo ranker), Model B (Quantile delay/risk), Model C (Price acceptance)
+• Configured Paths:
+  - models/model_a.txt
+  - models/model_b.txt
+  - models/model_c.txt (configured in config/default.yaml)
+• Model Artifact Status: No pre-trained weights exist yet. Wrappers must use deterministic baselines (clearly flagged) until trained on ingested datasets.
