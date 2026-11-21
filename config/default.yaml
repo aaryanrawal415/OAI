@@ -1,0 +1,27 @@
+app:
+  title: OptiFreight AI Backend
+  version: "0.1.0"
+  description: Production‑ready backend for OptiFreight AI
+
+database:
+  driver: postgresql+psycopg2
+  host: localhost
+  port: 5432
+  name: optifreight
+  user: optifreight
+  password: devil
+
+jwt:
+  secret_key: "${JWT_SECRET}"
+  algorithm: HS256
+  access_token_expires_minutes: 60
+
+uncdt_api:
+  client_id: "bb73d1bb-f25a-4ce7-afc1-fccf1890cd72"
+  client_secret: "DHIn8teDin2W9D3boAG0Z0flVsF+R/7aErO2xczoAdM="
+  base_url: "https://unctadstat-user-api.unctad.org"
+
+ml_models:
+  model_a_path: "models/model_a.txt"
+  model_b_path: "models/model_b.txt"
+  model_c_path: "models/model_c.txt"
