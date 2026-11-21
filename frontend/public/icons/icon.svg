@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="OptiFreight AI">
+  <rect width="128" height="128" rx="26" fill="#14213d"/>
+  <path d="M22 84h58V44H22z" fill="none" stroke="#f6f3ec" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M80 56h18l12 14v14H80z" fill="none" stroke="#f6f3ec" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="40" cy="90" r="9" fill="#e36414" stroke="#14213d" stroke-width="4"/>
+  <circle cx="98" cy="90" r="9" fill="#e36414" stroke="#14213d" stroke-width="4"/>
+</svg>
