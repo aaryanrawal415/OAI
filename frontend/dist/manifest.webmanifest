@@ -1,0 +1,12 @@
+{
+  "name": "OptiFreight AI",
+  "short_name": "OptiFreight",
+  "description": "Find compatible extra cargo along your planned route.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#14213d",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
